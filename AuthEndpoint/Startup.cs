@@ -13,10 +13,12 @@ namespace AuthEndpoint
 {
     public class Startup
     {
+
         public void Configuration(IAppBuilder app)
         {
             // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=316888
             var config = new HttpConfiguration();
+            //config.DependencyResolver
 
             ConfigureOAuth(app);
             
@@ -32,7 +34,7 @@ namespace AuthEndpoint
                 AllowInsecureHttp = false,
                 TokenEndpointPath = new PathString("/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
-                Provider = new SimpleAuthorizationServerProvider()
+                Provider = new SimpleAuthorizationServerProvider(new AuthRepository())
             };
 
             app.UseOAuthAuthorizationServer(OAuthServerOptions);

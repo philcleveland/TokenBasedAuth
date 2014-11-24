@@ -9,7 +9,7 @@ using System.Web;
 
 namespace AuthEndpoint
 {
-    public class AuthRepository : IDisposable
+    public class AuthRepository : IDisposable, AuthEndpoint.IAuthRepository
     {
         readonly AuthContext _ctx;
         readonly UserManager<IdentityUser> _userManager;
