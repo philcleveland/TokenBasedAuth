@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-
+using Microsoft.AspNet.Identity;
 namespace AuthEndpoint.Controllers
 {
     [RoutePrefix("api/account")]
@@ -26,9 +26,17 @@ namespace AuthEndpoint.Controllers
         {
             if (user == null) throw new ArgumentNullException("user");
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _authRepo.RegisterUser(user);
+            var result = await _authRepo.RegisterUser(user.UserName, user.Password);
             var errorResult = GetErrorResult(result);
             if (errorResult != null) return errorResult;
+            return Ok();
+        }
+
+        [Route("changepassword")]
+        [HttpPost]
+        public async Task<IHttpActionResult> ChangePassword(ChangePasswordModel model)
+        {
+            var result = await _authRepo.ChangePassword(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
             return Ok();
         }
 

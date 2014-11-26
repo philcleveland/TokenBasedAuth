@@ -2,10 +2,7 @@
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace AuthEndpoint
 {
@@ -20,13 +17,13 @@ namespace AuthEndpoint
             _userManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
         }
 
-        public async Task<IdentityResult> RegisterUser(UserModel user)
+        public async Task<IdentityResult> RegisterUser(string name, string password)
         {
             var identUser = new IdentityUser
             {
-                UserName = user.UserName,
+                UserName = name,
             };
-            var result = await _userManager.CreateAsync(identUser, user.Password);
+            var result = await _userManager.CreateAsync(identUser, password);
             return result;
         }
 
@@ -34,6 +31,11 @@ namespace AuthEndpoint
         {
             var user = await _userManager.FindAsync(userName, password);
             return user;
+        }
+
+        public async Task<IdentityResult> ChangePassword(string id, string oldPassword, string newPassword)
+        {
+            return await _userManager.ChangePasswordAsync(id, oldPassword, newPassword);
         }
 
         public void Dispose()
@@ -58,5 +60,7 @@ namespace AuthEndpoint
         //{
         //    Dispose(false);
         //}
+
+        
     }
 }
