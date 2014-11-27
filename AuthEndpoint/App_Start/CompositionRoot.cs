@@ -1,4 +1,7 @@
 ﻿using AuthEndpoint.Controllers;
+using AuthEndpoint.Models;
+using Raven.Client;
+using Raven.Client.Embedded;
 using System;
 using System.Net.Http;
 using System.Web.Http.Controllers;
@@ -11,10 +14,23 @@ namespace AuthEndpoint
     /// </summary>
     public class CompositionRoot : IHttpControllerActivator
     {
+        
+        RavenDBUserStore<UserModel> _userStore;
+
         public CompositionRoot()
         {
             //create singletons here
+            var documentStore = new EmbeddableDocumentStore()
+            {
+                //ConnectionStringName = "RavenDB",
+                UseEmbeddedHttpServer = true,
+                DataDirectory="~\\App_Data\\Ravendb",
+                DefaultDatabase="UserDataStore"
+            };
+            documentStore.Initialize();
+            Raven.Database.Server.NonAdminHttp.EnsureCanListenToWhenInNonAdminContext(8082);
 
+            _userStore = new RavenDBUserStore<UserModel>(documentStore);
         }
 
         /// <summary>
@@ -30,11 +46,13 @@ namespace AuthEndpoint
 
             if(controllerType == typeof(AccountController))
             {
-                return new AccountController();
+                return new AccountController(_userStore);
             }
 
-            throw new InvalidOperationException(string.Format("Unknown controller type requested. {0}", 
-                                                                controllerType.ToString()));
+            return Activator.CreateInstance(controllerType) as IHttpController;
+
+            //throw new InvalidOperationException(string.Format("Unknown controller type requested. {0}", 
+            //                                                    controllerType.ToString()));
         }
     }
 }

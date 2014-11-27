@@ -12,11 +12,13 @@ namespace AuthEndpoint.Controllers
     [RoutePrefix("api/account")]
     public class AccountController : ApiController
     {
-        readonly AuthRepository _authRepo;
-        
-        public AccountController()
+        //readonly AuthRepository _authRepo;
+        readonly RavenDBUserStore<UserModel> _userStore;
+        public AccountController(RavenDBUserStore<UserModel> userStore)
         {
-            _authRepo = new AuthRepository();
+            //_authRepo = new AuthRepository();
+            if (userStore == null) throw new ArgumentNullException("userStore");
+            _userStore = userStore;
         }
 
         [AllowAnonymous]
@@ -26,26 +28,26 @@ namespace AuthEndpoint.Controllers
         {
             if (user == null) throw new ArgumentNullException("user");
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var result = await _authRepo.RegisterUser(user.UserName, user.Password);
-            var errorResult = GetErrorResult(result);
-            if (errorResult != null) return errorResult;
+            await _userStore.CreateAsync(user);
+            //var errorResult = GetErrorResult(result);
+            //if (errorResult != null) return errorResult;
             return Ok();
         }
 
-        [Route("changepassword")]
-        [HttpPost]
-        public async Task<IHttpActionResult> ChangePassword(ChangePasswordModel model)
-        {
-            var result = await _authRepo.ChangePassword(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
-            return Ok();
-        }
+        //[Route("changepassword")]
+        //[HttpPost]
+        //public async Task<IHttpActionResult> ChangePassword(ChangePasswordModel model)
+        //{
+        //    var result = await _authRepo.ChangePassword(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
+        //    return Ok();
+        //}
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
                 // get rid of managed resources
-                _authRepo.Dispose();
+                //_authRepo.Dispose();
             }
             // get rid of unmanaged resources
             

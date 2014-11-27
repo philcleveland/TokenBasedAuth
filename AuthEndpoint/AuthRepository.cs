@@ -17,11 +17,12 @@ namespace AuthEndpoint
             _userManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
         }
 
-        public async Task<IdentityResult> RegisterUser(string name, string password)
+        public async Task<IdentityResult> RegisterUser(string name, string password, string email)
         {
             var identUser = new IdentityUser
             {
                 UserName = name,
+                Email = email
             };
             var result = await _userManager.CreateAsync(identUser, password);
             return result;

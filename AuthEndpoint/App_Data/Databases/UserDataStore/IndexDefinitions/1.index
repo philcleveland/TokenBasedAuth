@@ -1,0 +1,31 @@
+{
+  "IndexId": 1,
+  "Name": "Raven/DocumentsByEntityName",
+  "LockMode": "LockedIgnore",
+  "Map": "from doc in docs \r\nselect new \r\n{ \r\n\tTag = doc[\"@metadata\"][\"Raven-Entity-Name\"], \r\n\tLastModified = (DateTime)doc[\"@metadata\"][\"Last-Modified\"],\r\n\tLastModifiedTicks = ((DateTime)doc[\"@metadata\"][\"Last-Modified\"]).Ticks \r\n};",
+  "Maps": [
+    "from doc in docs \r\nselect new \r\n{ \r\n\tTag = doc[\"@metadata\"][\"Raven-Entity-Name\"], \r\n\tLastModified = (DateTime)doc[\"@metadata\"][\"Last-Modified\"],\r\n\tLastModifiedTicks = ((DateTime)doc[\"@metadata\"][\"Last-Modified\"]).Ticks \r\n};"
+  ],
+  "Reduce": null,
+  "IsMapReduce": false,
+  "IsCompiled": false,
+  "Stores": {},
+  "Indexes": {
+    "Tag": "NotAnalyzed",
+    "LastModified": "NotAnalyzed",
+    "LastModifiedTicks": "NotAnalyzed"
+  },
+  "SortOptions": {
+    "LastModified": "String",
+    "LastModifiedTicks": "Long"
+  },
+  "Analyzers": {},
+  "Fields": [],
+  "Suggestions": {},
+  "TermVectors": {},
+  "SpatialIndexes": {},
+  "InternalFieldsMapping": null,
+  "MaxIndexOutputsPerDocument": null,
+  "Type": "Map",
+  "DisableInMemoryIndexing": true
+}
