@@ -11,7 +11,7 @@ namespace AuthEndpoint
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
-            config.Services.Replace(typeof(IHttpControllerActivator), new CompositionRoot());
+            //config.Services.Replace(typeof(IHttpControllerActivator), new CompositionRoot());
 
             // Web API routes
             config.MapHttpAttributeRoutes();

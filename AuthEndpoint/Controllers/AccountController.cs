@@ -13,24 +13,31 @@ namespace AuthEndpoint.Controllers
     public class AccountController : ApiController
     {
         //readonly AuthRepository _authRepo;
-        readonly RavenDBUserStore<UserModel> _userStore;
-        public AccountController(RavenDBUserStore<UserModel> userStore)
+        readonly IAuthRepository _authRepo;
+        public AccountController(IAuthRepository authRepo)
         {
             //_authRepo = new AuthRepository();
-            if (userStore == null) throw new ArgumentNullException("userStore");
-            _userStore = userStore;
+            if (authRepo == null) throw new ArgumentNullException("userStore");
+            _authRepo = authRepo;
         }
 
         [AllowAnonymous]
         [Route("register")]
         [HttpPost]
-        public async Task<IHttpActionResult> Register(UserModel user)
+        public async Task<IHttpActionResult> Register(UserViewModel user)
         {
             if (user == null) throw new ArgumentNullException("user");
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            await _userStore.CreateAsync(user);
-            //var errorResult = GetErrorResult(result);
-            //if (errorResult != null) return errorResult;
+
+            var userModel = new UserModel()
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+            };
+
+            var result = await _authRepo.RegisterUser(userModel, user.Password);
+            var errorResult = GetErrorResult(result);
+            if (errorResult != null) return errorResult;
             return Ok();
         }
 
@@ -50,7 +57,7 @@ namespace AuthEndpoint.Controllers
                 //_authRepo.Dispose();
             }
             // get rid of unmanaged resources
-            
+
         }
 
         // only if you use unmanaged resources directly in AccountController
@@ -62,7 +69,7 @@ namespace AuthEndpoint.Controllers
         private IHttpActionResult GetErrorResult(Microsoft.AspNet.Identity.IdentityResult result)
         {
             if (result == null) return InternalServerError();
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
                 {

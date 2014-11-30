@@ -6,12 +6,12 @@ using System.Web;
 
 namespace AuthEndpoint
 {
-    public class AuthContext : IdentityDbContext<IdentityUser>
-    {
-        public AuthContext()
-            :base("AuthContext")
-        {
+    //public class AuthContext : IdentityDbContext<IdentityUser>
+    //{
+    //    public AuthContext()
+    //        :base("AuthContext")
+    //    {
 
-        }
-    }
+    //    }
+    //}
 }
