@@ -9,5 +9,6 @@ namespace AuthEndpoint
     {
         Task<UserModel> FindUser(string userName, string password);
         Task<IdentityResult> RegisterUser(UserModel user, string password);
+        Task<IdentityResult> ChangePassword(string userId, string oldPassword, string newPassword);
     }
 }

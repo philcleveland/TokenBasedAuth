@@ -41,13 +41,13 @@ namespace AuthEndpoint.Controllers
             return Ok();
         }
 
-        //[Route("changepassword")]
-        //[HttpPost]
-        //public async Task<IHttpActionResult> ChangePassword(ChangePasswordModel model)
-        //{
-        //    var result = await _authRepo.ChangePassword(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
-        //    return Ok();
-        //}
+        [Route("changepassword")]
+        [HttpPost]
+        public async Task<IHttpActionResult> ChangePassword(ChangePasswordModel model)
+        {
+            var result = await _authRepo.ChangePassword(model.UserID, model.OldPassword, model.NewPassword);
+            return Ok();
+        }
 
         protected override void Dispose(bool disposing)
         {

@@ -33,8 +33,7 @@ namespace AuthEndpoint
 
         public async Task<TUser> FindByIdAsync(string userId)
         {
-            return await Session.Query<TUser>()
-                .FirstOrDefaultAsync(u => u.Id == userId);
+            return await Session.LoadAsync<TUser>(userId.Split('/')[1]);
         }
 
         public async Task<TUser> FindByNameAsync(string userName)

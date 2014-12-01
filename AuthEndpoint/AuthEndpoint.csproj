@@ -141,7 +141,6 @@
   <ItemGroup>
     <Compile Include="App_Start\RavenModule.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="AuthContext.cs" />
     <Compile Include="NinjectDependencyResolver.cs" />
     <Compile Include="RavenDBAuthRepository.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -157,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <None Include="Properties\PublishProfiles\brewday.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
