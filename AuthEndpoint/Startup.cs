@@ -114,7 +114,7 @@ namespace AuthEndpoint
                                           CONSTRAINT `ApplicationUser_Logins` FOREIGN KEY (`UserId`) REFERENCES `users` (`Id`) ON DELETE CASCADE ON UPDATE NO ACTION
                                         );
 
-                                        CREATE TABLE `userroles` (
+                                        CREATE TABLE IF NOT EXISTS  `userroles` (
                                           `UserId` varchar(128) NOT NULL,
                                           `RoleId` varchar(128) NOT NULL,
                                           PRIMARY KEY (`UserId`,`RoleId`),

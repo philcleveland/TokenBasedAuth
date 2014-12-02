@@ -6,7 +6,7 @@ using System.Web;
 
 namespace AuthEndpoint.Models
 {
-    public class ChangePasswordModel
+    public class ChangePasswordViewModel
     {
         [Required]
         public string UserID { get; set; }

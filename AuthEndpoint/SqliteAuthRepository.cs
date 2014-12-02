@@ -7,34 +7,29 @@ namespace AuthEndpoint
 {
     public class SqliteAuthRepository : IDisposable, IAuthRepository
     {
+        readonly UserManager<User> _userMgr;
 
-        readonly string _connStr;
         public SqliteAuthRepository(string connectionString)
         {
-            _connStr = connectionString;
+            var userStore = new SqliteUserStore<User>(connectionString);
+            _userMgr = new UserManager<User>(userStore);
         }
 
-        public async Task<IdentityResult> RegisterUser(UserModel user, string password)
+        public async Task<IdentityResult> RegisterUser(User user, string password)
         {
-            var userStore = new SqliteUserStore<UserModel>(_connStr);
-            var userManager = new UserManager<UserModel>(userStore);
-            var result = await userManager.CreateAsync(user, password);
+            var result = await _userMgr.CreateAsync(user, password);
             return result;
         }
 
-        public async Task<UserModel> FindUser(string userName, string password)
+        public async Task<User> FindUser(string userName, string password)
         {
-            var userStore = new SqliteUserStore<UserModel>(_connStr);
-            var userManager = new UserManager<UserModel>(userStore);
-            var user = await userManager.FindAsync(userName, password);
+            var user = await _userMgr.FindAsync(userName, password);
             return user;
         }
 
         public async Task<IdentityResult> ChangePassword(string id, string oldPassword, string newPassword)
         {
-            var userStore = new SqliteUserStore<UserModel>(_connStr);
-            var userManager = new UserManager<UserModel>(userStore);
-            var result = await userManager.ChangePasswordAsync(id, oldPassword, newPassword);
+            var result = await _userMgr.ChangePasswordAsync(id, oldPassword, newPassword);
             return result;
         }
 
@@ -49,8 +44,7 @@ namespace AuthEndpoint
             if (disposing)
             {
                 // get rid of managed resources
-                //_ctx.Dispose();
-                //_userManager.Dispose();
+                _userMgr.Dispose();
             }
             // get rid of unmanaged resources
         }

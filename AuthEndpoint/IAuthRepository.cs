@@ -7,7 +7,8 @@ namespace AuthEndpoint
 {
     public interface IAuthRepository
     {
-        Task<UserModel> FindUser(string userName, string password);
-        Task<IdentityResult> RegisterUser(UserModel user, string password);
+        Task<User> FindUser(string userName, string password);
+        Task<IdentityResult> RegisterUser(User user, string password);
+        Task<IdentityResult> ChangePassword(string id, string oldPassword, string newPassword);
     }
 }

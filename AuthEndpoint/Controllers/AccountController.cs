@@ -8,7 +8,6 @@ namespace AuthEndpoint.Controllers
     [RoutePrefix("api/account")]
     public class AccountController : ApiController
     {
-        //readonly AuthRepository _authRepo;
         readonly IAuthRepository _authRepo;
         public AccountController(IAuthRepository authRepo)
         {
@@ -24,7 +23,7 @@ namespace AuthEndpoint.Controllers
             if (user == null) throw new ArgumentNullException("user");
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var userModel = new UserModel()
+            var userModel = new User()
             {
                 UserName = user.UserName,
                 Email = user.Email,
@@ -36,13 +35,13 @@ namespace AuthEndpoint.Controllers
             return Ok();
         }
 
-        //[Route("changepassword")]
-        //[HttpPost]
-        //public async Task<IHttpActionResult> ChangePassword(ChangePasswordModel model)
-        //{
-        //    var result = await _authRepo.ChangePassword(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
-        //    return Ok();
-        //}
+        [Route("changepassword")]
+        [HttpPost]
+        public async Task<IHttpActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            var result = await _authRepo.ChangePassword(model.UserID, model.OldPassword, model.NewPassword);
+            return Ok();
+        }
 
         protected override void Dispose(bool disposing)
         {

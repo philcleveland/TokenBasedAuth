@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNet.Identity;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace AuthEndpoint.Models
 {
@@ -20,19 +15,8 @@ namespace AuthEndpoint.Models
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
+        [Required]
         [DataType(DataType.EmailAddress)]
-        public string Email { get; set; }
-    }
-
-    public class UserModel : IUser
-    {
-        public UserModel()
-        {
-            Id = null;
-        }
-        public string Id { get; set; }
-        public string UserName { get; set; }
-        public string PasswordHash { get; set; }
         public string Email { get; set; }
     }
 }
