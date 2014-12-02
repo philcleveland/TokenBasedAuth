@@ -1,12 +1,8 @@
 ﻿using AuthEndpoint.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Microsoft.AspNet.Identity;
+
 namespace AuthEndpoint.Controllers
 {
     [RoutePrefix("api/account")]
@@ -16,7 +12,6 @@ namespace AuthEndpoint.Controllers
         readonly IAuthRepository _authRepo;
         public AccountController(IAuthRepository authRepo)
         {
-            //_authRepo = new AuthRepository();
             if (authRepo == null) throw new ArgumentNullException("userStore");
             _authRepo = authRepo;
         }

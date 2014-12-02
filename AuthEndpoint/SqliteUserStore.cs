@@ -1,52 +1,73 @@
 ﻿using AuthEndpoint.Models;
 using Microsoft.AspNet.Identity;
-using Raven.Client;
 using System;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Dapper;
+using System.Data.SQLite;
+using System.Web.Configuration;
+using System.IO;
 
 namespace AuthEndpoint
 {
-    public class RavenDBUserStore<TUser> :
+    public class SqliteUserStore<TUser> :
         IUserStore<TUser>,
         IUserPasswordStore<TUser>
         where TUser : UserModel
     {
-        IAsyncDocumentSession Session { get; set; }
-        public RavenDBUserStore(IAsyncDocumentSession session)
+        readonly string _connString;
+        public SqliteUserStore(string connectionString)
         {
-            Session = session;
+            _connString = connectionString;
         }
 
         public async Task CreateAsync(TUser user)
         {
             
             if (user == null) throw new ArgumentNullException("user");
-            await Session.StoreAsync(user);
+            using (var connection = new SQLiteConnection(_connString))
+            {
+
+            }
+            throw new NotImplementedException();
         }
 
         public async Task DeleteAsync(TUser user)
         {
             if (user == null) throw new ArgumentNullException("user");
-            Session.Delete(user);
-            await Task.FromResult<object>(null);
+            using (var connection = new SQLiteConnection(_connString))
+            {
+
+            }
+            throw new NotImplementedException();
         }
 
         public async Task<TUser> FindByIdAsync(string userId)
         {
-            return await Session.Query<TUser>()
-                .FirstOrDefaultAsync(u => u.Id == userId);
+            using (var connection = new SQLiteConnection(_connString))
+            {
+
+            }
+            throw new NotImplementedException();
+            
         }
 
         public async Task<TUser> FindByNameAsync(string userName)
         {
-            return await Session.Query<TUser>()
-                .FirstOrDefaultAsync<TUser>(u => u.UserName == userName);
+            using (var connection = new SQLiteConnection(_connString))
+            {
+
+            }
+            throw new NotImplementedException();
         }
 
         public async Task UpdateAsync(TUser user)
         {
-            if (user == null) throw new ArgumentNullException("user");
-            await Session.StoreAsync(user);
+            using (var connection = new SQLiteConnection(_connString))
+            {
+
+            }
+            throw new NotImplementedException();
         }
 
         public Task<string> GetPasswordHashAsync(TUser user)
