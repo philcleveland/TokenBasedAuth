@@ -9,15 +9,15 @@ namespace AuthEndpoint
     {
         readonly UserManager<User> _userMgr;
 
-        public SqliteAuthRepository(string connectionString)
+        public SqliteAuthRepository(UserManager<User> userMgr)
         {
-            var userStore = new SqliteUserStore<User>(connectionString);
-            _userMgr = new UserManager<User>(userStore);
+            _userMgr = userMgr;
         }
 
         public async Task<IdentityResult> RegisterUser(User user, string password)
         {
             var result = await _userMgr.CreateAsync(user, password);
+            await _userMgr.SendEmailAsync(user.Id, "Success", "Hey welcome to BLAH");
             return result;
         }
 
