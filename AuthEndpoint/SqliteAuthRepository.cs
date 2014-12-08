@@ -7,9 +7,9 @@ namespace AuthEndpoint
 {
     public class SqliteAuthRepository : IDisposable, IAuthRepository
     {
-        readonly UserManager<User> _userMgr;
+        readonly AppUserManager _userMgr;
 
-        public SqliteAuthRepository(UserManager<User> userMgr)
+        public SqliteAuthRepository(AppUserManager userMgr)
         {
             _userMgr = userMgr;
         }

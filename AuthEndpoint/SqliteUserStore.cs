@@ -11,10 +11,12 @@ namespace AuthEndpoint
 {
     public class SqliteUserStore<TUser> :
         IUserStore<TUser>,
-        IUserPasswordStore<TUser>
+        IUserPasswordStore<TUser>,
+        IUserEmailStore<TUser>
         where TUser : User
     {
         public static readonly string GetByNameStatement = @"SELECT * FROM users WHERE UserName = @userName";
+        public static readonly string GetByEmailStatement = @"SELECT * FROM users WHERE Email = @email";
         public static readonly string InsertUserStatement = @"insert into Users ([Id], [Email], [EmailConfirmed], [PasswordHash], [SecurityStamp], [PhoneNumber], [PhoneNumberConfirmed], [TwoFactorEnabled], [LockoutEndDateUtc], [LockoutEnabled], [AccessFailedCount], [UserName])
                                                                           Values(@Id, @Email, @EmailConfirmed, @PasswordHash, @SecurityStamp, @PhoneNumber, @PhoneNumberConfirmed, @TwoFactorEnabled, @LockoutEndDateUtc, @LockoutEnabled, @AccessFailedCount, @UserName)";
         readonly string _connString;
@@ -43,6 +45,7 @@ namespace AuthEndpoint
 
         public async Task<TUser> FindByIdAsync(string userId)
         {
+            if (userId == null) throw new ArgumentNullException("userId");
             using (var cn = GetOpenConnection())
             {
                 var user = await cn.GetAsync<TUser>(userId);
@@ -52,6 +55,7 @@ namespace AuthEndpoint
 
         public async Task<TUser> FindByNameAsync(string userName)
         {
+            if (userName == null) throw new ArgumentNullException("userName");
             using (var cn = GetOpenConnection())
             {
                 var user = await cn.QueryAsync<TUser>(GetByNameStatement, new { UserName = userName });
@@ -61,8 +65,52 @@ namespace AuthEndpoint
 
         public async Task UpdateAsync(TUser user)
         {
+            if (user == null) throw new ArgumentNullException("user");
             using (var cn = GetOpenConnection())
             {
+                await cn.UpdateAsync<TUser>(user);
+            }
+        }
+
+        public async Task<TUser> FindByEmailAsync(string email)
+        {
+            if (email == null) throw new ArgumentNullException("email");
+            using (var cn = GetOpenConnection())
+            {
+                var user = await cn.QueryAsync<TUser>(GetByEmailStatement, new { Email = email });
+                return user.FirstOrDefault();
+            }
+        }
+
+        public Task<string> GetEmailAsync(TUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            return Task.FromResult(user.Email);
+        }
+
+        public Task<bool> GetEmailConfirmedAsync(TUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            return Task.FromResult(user.EmailConfirmed == 1 ? true : false);
+        }
+
+        public async Task SetEmailAsync(TUser user, string email)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            if (email == null) throw new ArgumentNullException("email");
+            using (var cn = GetOpenConnection())
+            {
+                user.Email = email;
+                await cn.UpdateAsync<TUser>(user);
+            }
+        }
+
+        public async Task SetEmailConfirmedAsync(TUser user, bool confirmed)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            using (var cn = GetOpenConnection())
+            {
+                user.EmailConfirmed = confirmed == true ? 1 : 0;
                 await cn.UpdateAsync<TUser>(user);
             }
         }
@@ -110,5 +158,7 @@ namespace AuthEndpoint
             Console.WriteLine(e.Statement);
             Console.BackgroundColor = curColor;
         }
+
+
     }
 }

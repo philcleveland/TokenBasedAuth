@@ -11,8 +11,8 @@ namespace AuthEndpoint.Controllers
     public class AccountController : ApiController
     {
         readonly IAuthRepository _authRepo;
-        readonly UserManager<User> _userMgr;
-        public AccountController(IAuthRepository authRepo, UserManager<User> userMgr)
+        readonly AppUserManager _userMgr;
+        public AccountController(IAuthRepository authRepo, AppUserManager userMgr)
         {
             if (authRepo == null) throw new ArgumentNullException("authRepo");
             if (userMgr == null) throw new ArgumentNullException("userMgr");
@@ -39,12 +39,12 @@ namespace AuthEndpoint.Controllers
             var errorResult = GetErrorResult(result);
             if (errorResult != null) return errorResult;
 
-            //if (result.Succeeded)
-            //{
-            //    var code = _userMgr.GenerateEmailConfirmationToken(userModel.Id);
-            //    var callbackUrl = Url.Link("DefaultApi", new { Controller = "Account", Action="ConfirmEmail", UserId = userModel.Id, Code = code });
-            //    await _userMgr.SendEmailAsync(userModel.Id, "Success", callbackUrl);
-            //}
+            if (result.Succeeded)
+            {
+                var code = _userMgr.GenerateEmailConfirmationToken(userModel.Id);
+                var callbackUrl = Url.Link("DefaultApi", new { Controller = "Account", Action = "ConfirmEmail", UserId = userModel.Id, Code = code });
+                await _userMgr.SendEmailAsync(userModel.Id, "Success", callbackUrl);
+            }
 
             return Ok();
         }

@@ -1,26 +1,25 @@
 ﻿using AuthEndpoint.Models;
 using AuthEndpoint.Providers;
-using Dapper;
+using Autofac;
+using Autofac.Integration.WebApi;
+using Autofac.Integration.Owin;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Cors;
 using Microsoft.Owin.Security.OAuth;
-using Ninject;
 using Owin;
 using System;
-using System.Data.SqlClient;
-using System.Data.SQLite;
-using System.IO;
-using System.Web.Configuration;
+using System.Reflection;
 using System.Web.Http;
+using System.Web.Http.Dependencies;
+using Microsoft.AspNet.Identity.Owin;
 
 [assembly: OwinStartup(typeof(AuthEndpoint.Startup))]
 namespace AuthEndpoint
 {
     public class Startup
     {
-        public IKernel Kernal { get; private set; }
+        public AutofacWebApiDependencyResolver Kernal { get; set; }
         public void Configuration(IAppBuilder app)
         {
             // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=316888
@@ -30,19 +29,47 @@ namespace AuthEndpoint
             var connectionString = AuthenticationDatabase.LocalizeSQLiteConnection(connStr);
             AuthenticationDatabase.InitializeSQLiteDatabase(connectionString);
 
-            Kernal = CreateKernel(connectionString);
+            var builder = new ContainerBuilder();
 
-            config.DependencyResolver = new NinjectDependencyResolver(Kernal);
+            builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
+            
+            builder.RegisterType<SqliteAuthRepository>().As<IAuthRepository>();
 
-            ConfigureOAuth(app);
+            builder.RegisterType<SqliteUserStore<User>>()
+                .AsImplementedInterfaces()
+                .WithParameter("connectionString", connectionString);
+                //.InstancePerRequest();
+
+            builder.RegisterType<EmailService>().As<IIdentityMessageService>();
+
+            builder.Register<IdentityFactoryOptions<AppUserManager>>(c => new IdentityFactoryOptions<AppUserManager>() 
+                                                                                { 
+                                                                                    DataProtectionProvider = new Microsoft.Owin.Security.DataProtection.DpapiDataProtectionProvider() 
+                                                                                });
+
+            builder.RegisterType<AppUserManager>().AsSelf();
+            //.InstancePerRequest();
+            builder.RegisterType<AuthorizationServerProvider>().As<IOAuthAuthorizationServerProvider>();
+
+            var container = builder.Build();
+            var resolver = new AutofacWebApiDependencyResolver(container);
+            
+            config.DependencyResolver = resolver;
+
+            ConfigureOAuth(app, resolver.GetService(typeof(IOAuthAuthorizationServerProvider)) as IOAuthAuthorizationServerProvider);
 
 
             WebApiConfig.Register(config);
+            //app.CreatePerOwinContext<AppUserManager>(AppUserManager.Create);
+            app.UseAutofacMiddleware(container);
+            app.UseAutofacWebApi(config);
             app.UseCors(CorsOptions.AllowAll);
             app.UseWebApi(config);
+
+            
         }
 
-        private void ConfigureOAuth(IAppBuilder app)
+        private void ConfigureOAuth(IAppBuilder app, IOAuthAuthorizationServerProvider authprovider)
         {
             var OAuthServerOptions = new OAuthAuthorizationServerOptions()
             {
@@ -54,35 +81,12 @@ namespace AuthEndpoint
 
                 TokenEndpointPath = new PathString("/login"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
-                Provider = new AuthorizationServerProvider(Kernal.Get<IAuthRepository>())
+                Provider = authprovider
             };
 
             app.UseOAuthAuthorizationServer(OAuthServerOptions);
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
         }
 
-        public static IKernel CreateKernel(string authDatabaseConnectionString)
-        {
-            var kernel = new StandardKernel();
-
-            kernel.Bind<IUserStore<User>>()
-                .To<SqliteUserStore<User>>()
-                .WithConstructorArgument("connectionString", authDatabaseConnectionString);
-
-            var userManager = new UserManager<User>(kernel.Get<IUserStore<User>>());
-            userManager.UserLockoutEnabledByDefault = true;
-            userManager.DefaultAccountLockoutTimeSpan = TimeSpan.FromMinutes(2);
-            userManager.MaxFailedAccessAttemptsBeforeLockout = 5;
-            userManager.EmailService = new EmailService();
-            //userManager.UserTokenProvider = new DataProtectorTokenProvider<User>(protector);
-
-            kernel.Bind<UserManager<User>>().ToConstant(userManager);
-                //.ToSelf();
-
-            kernel.Bind<IAuthRepository>()
-                .To<SqliteAuthRepository>();
-
-            return kernel;
-        }
     }
 }
