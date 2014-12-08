@@ -1,7 +1,9 @@
 ﻿using AuthEndpoint.Models;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Threading.Tasks;
 using System.Web.Http;
+
 
 namespace AuthEndpoint.Controllers
 {
@@ -9,10 +11,13 @@ namespace AuthEndpoint.Controllers
     public class AccountController : ApiController
     {
         readonly IAuthRepository _authRepo;
-        public AccountController(IAuthRepository authRepo)
+        readonly UserManager<User> _userMgr;
+        public AccountController(IAuthRepository authRepo, UserManager<User> userMgr)
         {
-            if (authRepo == null) throw new ArgumentNullException("userStore");
+            if (authRepo == null) throw new ArgumentNullException("authRepo");
+            if (userMgr == null) throw new ArgumentNullException("userMgr");
             _authRepo = authRepo;
+            _userMgr = userMgr;
         }
 
         [AllowAnonymous]
@@ -29,9 +34,18 @@ namespace AuthEndpoint.Controllers
                 Email = user.Email,
             };
 
+            //TODO: make up a password here and send it on the confirmation email?
             var result = await _authRepo.RegisterUser(userModel, user.Password);
             var errorResult = GetErrorResult(result);
             if (errorResult != null) return errorResult;
+
+            //if (result.Succeeded)
+            //{
+            //    var code = _userMgr.GenerateEmailConfirmationToken(userModel.Id);
+            //    var callbackUrl = Url.Link("DefaultApi", new { Controller = "Account", Action="ConfirmEmail", UserId = userModel.Id, Code = code });
+            //    await _userMgr.SendEmailAsync(userModel.Id, "Success", callbackUrl);
+            //}
+
             return Ok();
         }
 
@@ -40,6 +54,17 @@ namespace AuthEndpoint.Controllers
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             var result = await _authRepo.ChangePassword(model.UserID, model.OldPassword, model.NewPassword);
+            return Ok();
+        }
+
+        [Route("confirmemail")]
+        [HttpGet]
+        public async Task<IHttpActionResult> ConfirmEmail(string userId, string code)
+        {
+            //authrepo add password
+            //authrepo set email to confirmed
+            //etc.
+            Console.WriteLine("User: " + userId + "confirmed. Code was " + code);
             return Ok();
         }
 

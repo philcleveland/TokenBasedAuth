@@ -143,9 +143,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppUserManager.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="AuthenticationDatabaseInitialize.cs" />
     <Compile Include="Dapper\SqlMapperExtensions.cs" />
+    <Compile Include="EmailService.cs" />
     <Compile Include="Models\UserViewModel.cs" />
     <Compile Include="NinjectDependencyResolver.cs" />
     <Compile Include="SqliteAuthRepository.cs" />
@@ -161,9 +163,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="ConnectionStrings.config" />
     <None Include="Properties\PublishProfiles\brewday.pubxml" />
-    <None Include="Properties\PublishProfiles\brewdayauth %282%29.pubxml" />
-    <None Include="Properties\PublishProfiles\brewdayauth.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

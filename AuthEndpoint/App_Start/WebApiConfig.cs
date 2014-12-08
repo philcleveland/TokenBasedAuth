@@ -11,7 +11,6 @@ namespace AuthEndpoint
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
-            //config.Services.Replace(typeof(IHttpControllerActivator), new CompositionRoot());
 
             // Web API routes
             config.MapHttpAttributeRoutes();
@@ -21,8 +20,9 @@ namespace AuthEndpoint
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-
+#if !DEBUG
             config.Filters.Add(new AuthEndpoint.Filters.RequireHttpsAttribute());
+#endif
         }
     }
 }

@@ -17,7 +17,6 @@ namespace AuthEndpoint
         public async Task<IdentityResult> RegisterUser(User user, string password)
         {
             var result = await _userMgr.CreateAsync(user, password);
-            await _userMgr.SendEmailAsync(user.Id, "Success", "Hey welcome to BLAH");
             return result;
         }
 
