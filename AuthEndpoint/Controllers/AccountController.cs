@@ -61,10 +61,9 @@ namespace AuthEndpoint.Controllers
         [HttpGet]
         public async Task<IHttpActionResult> ConfirmEmail(string userId, string code)
         {
-            //authrepo add password
-            //authrepo set email to confirmed
-            //etc.
-            Console.WriteLine("User: " + userId + "confirmed. Code was " + code);
+            var result = await _userMgr.ConfirmEmailAsync(userId, code);
+            var errorResult = GetErrorResult(result);
+            if (errorResult != null) return errorResult;
             return Ok();
         }
 
