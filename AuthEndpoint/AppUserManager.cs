@@ -8,14 +8,11 @@ namespace AuthEndpoint
 {
     public class AppUserManager : UserManager<User>
     {
-        //readonly IUserStore<User> _store;
         public AppUserManager(IUserStore<User> store, 
             IdentityFactoryOptions<AppUserManager> options,
             IIdentityMessageService emailSvc)
             : base(store)
         {
-            //_store = store;
-
             this.UserLockoutEnabledByDefault = true;
             this.DefaultAccountLockoutTimeSpan = TimeSpan.FromMinutes(5);
             this.MaxFailedAccessAttemptsBeforeLockout = 5;

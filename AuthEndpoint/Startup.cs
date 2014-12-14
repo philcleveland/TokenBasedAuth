@@ -25,19 +25,17 @@ namespace AuthEndpoint
             // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=316888
             var config = new HttpConfiguration();
 
-            var connStr = System.Configuration.ConfigurationManager.ConnectionStrings["Identity"];
-            var connectionString = AuthenticationDatabase.LocalizeSQLiteConnection(connStr);
-            AuthenticationDatabase.InitializeSQLiteDatabase(connectionString);
+            var connStr = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
             var builder = new ContainerBuilder();
 
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
             
-            builder.RegisterType<SqliteAuthRepository>().As<IAuthRepository>();
+            builder.RegisterType<AuthRepository>().As<IAuthRepository>();
 
-            builder.RegisterType<SqliteUserStore<User>>()
+            builder.RegisterType<SQLBasedUserStore<User>>()
                 .AsImplementedInterfaces()
-                .WithParameter("connectionString", connectionString);
+                .WithParameter("connectionString", connStr);
                 //.InstancePerRequest();
 
             builder.RegisterType<EmailService>().As<IIdentityMessageService>();
@@ -58,9 +56,8 @@ namespace AuthEndpoint
 
             ConfigureOAuth(app, resolver.GetService(typeof(IOAuthAuthorizationServerProvider)) as IOAuthAuthorizationServerProvider);
 
-
             WebApiConfig.Register(config);
-            //app.CreatePerOwinContext<AppUserManager>(AppUserManager.Create);
+            
             app.UseAutofacMiddleware(container);
             app.UseAutofacWebApi(config);
             app.UseCors(CorsOptions.AllowAll);

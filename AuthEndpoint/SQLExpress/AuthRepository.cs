@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace AuthEndpoint
 {
-    public class SqliteAuthRepository : IDisposable, IAuthRepository
+    public class AuthRepository : IDisposable, IAuthRepository
     {
         readonly AppUserManager _userMgr;
 
-        public SqliteAuthRepository(AppUserManager userMgr)
+        public AuthRepository(AppUserManager userMgr)
         {
             _userMgr = userMgr;
         }
